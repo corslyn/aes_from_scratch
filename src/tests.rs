@@ -14,4 +14,10 @@ mod test {
         let expected = [0x7c, 0x25, 0x0b, 0x7b];
         assert_eq!(sub_word(word), expected);
     }
+    #[test]
+    fn rcon_test() {
+        let input = 67;
+        let expected = [0x2f, 0, 0, 0];
+        assert_eq!(rcon(input), expected);
+    }
 }

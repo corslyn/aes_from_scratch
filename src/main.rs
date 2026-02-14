@@ -15,3 +15,7 @@ fn sub_word(word: [u8; 4]) -> [u8; 4] {
         config::SBOX[word[3] as usize],
     ]
 }
+
+fn rcon(input: usize) -> [u8; 4] {
+    [config::RCON[input], 0, 0, 0]
+}
