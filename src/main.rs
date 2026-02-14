@@ -1,14 +1,15 @@
+mod config;
+mod tests;
+
 fn rot_word(word: [u8; 4]) -> [u8; 4] {
     [word[1], word[2], word[3], word[0]]
 }
 
-mod test {
-    use super::*;
-
-    #[test]
-    fn rot_word_test() {
-        let word = [0x00, 0x01, 0x02, 0x03];
-        let expected = [0x01, 0x02, 0x03, 0x00];
-        assert_eq!(rot_word(word), expected);
-    }
+fn sub_word(word: [u8; 4]) -> [u8; 4] {
+    [
+        config::SBOX[word[0] as usize],
+        config::SBOX[word[1] as usize],
+        config::SBOX[word[2] as usize],
+        config::SBOX[word[3] as usize],
+    ]
 }
