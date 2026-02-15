@@ -8,3 +8,7 @@ name = "aes_from_scratch"
 path = "aes/lib.rs"
 [dependencies]
 hex = "0.4.3"
+
+[[bin]]
+name = "square"
+path = "attacks/square/mod.rs"

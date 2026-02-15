@@ -1,2 +1,5 @@
-// Placeholder for square attack implementation
-// Add your square attack logic here.
+use aes_from_scratch::*;
+
+fn main() {
+    println!("helo");
+}
