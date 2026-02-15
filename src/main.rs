@@ -70,3 +70,11 @@ fn print_state(state: [u8; 16]) {
         println!();
     }
 }
+
+fn sub_bytes(state: [u8; 16]) -> [u8; 16] {
+    let mut modified = state.clone();
+    for i in 0..16 {
+        modified[i as usize] = config::SBOX[i as usize];
+    }
+    modified
+}
