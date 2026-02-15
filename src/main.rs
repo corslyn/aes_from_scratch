@@ -1,7 +1,13 @@
 mod config;
 mod tests;
 
-fn main() {}
+fn main() {
+    let state: [u8; 16] = "this is one text"
+        .as_bytes()
+        .try_into()
+        .expect("state is not 16 bytes !");
+    print_state(state);
+}
 
 fn rot_word(word: [u8; 4]) -> [u8; 4] {
     [word[1], word[2], word[3], word[0]]
@@ -54,4 +60,13 @@ fn key_expansion(key: [u8; 16]) -> Vec<[u8; 16]> {
     }
 
     round_keys
+}
+
+fn print_state(state: [u8; 16]) {
+    for row in 0..4 {
+        for col in 0..4 {
+            print!("{:02x} ", state[(row + 4 * col) as usize]);
+        }
+        println!();
+    }
 }
