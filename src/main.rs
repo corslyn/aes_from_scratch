@@ -1,21 +1,33 @@
-mod config;
 mod aes;
+mod config;
 
 use aes::encrypt;
 
 use hex;
 
+use crate::aes::decrypt;
 
 fn main() {
-    let plaintext: [u8; 16] = "theblockbreakers"
+    let plaintext: [u8; 16] = "Choucroute !!!!!"
         .as_bytes()
         .try_into()
-        .expect("state is not 16 bytes !");
-    let key: [u8; 16] = hex::decode("2b7e151628aed2a6abf7158809cf4f3c")
+        .expect("plaintext is not 16 bytes !");
+    let key: [u8; 16] = hex::decode("44666c2dab8af940ea00076487d462a6")
         .unwrap()
         .try_into()
         .unwrap();
-    print_state(encrypt(plaintext, key));
+    println!("Plaintext : {}", std::str::from_utf8(&plaintext).unwrap());
+    let encrypted = encrypt(plaintext, key);
+    print!("Encrypted : ");
+    for byte in encrypted {
+        print!("{:02x}", byte);
+    }
+    println!();
+
+    println!(
+        "Decrypted : {}",
+        std::str::from_utf8(&decrypt(encrypted, key)).expect("not a valid utf8")
+    );
 }
 
 fn print_state(state: [u8; 16]) {
@@ -26,5 +38,3 @@ fn print_state(state: [u8; 16]) {
         println!();
     }
 }
-
-

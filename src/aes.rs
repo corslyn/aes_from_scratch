@@ -56,7 +56,7 @@ fn key_expansion(key: [u8; 16]) -> Vec<[u8; 16]> {
 fn sub_bytes(state: [u8; 16]) -> [u8; 16] {
     let mut modified = [0u8; 16];
     for i in 0..16 {
-        modified[i as usize] = config::SBOX[state[i] as usize];
+        modified[i] = config::SBOX[state[i] as usize];
     }
     modified
 }
@@ -112,6 +112,76 @@ pub fn encrypt(plaintext: [u8; 16], key: [u8; 16]) -> [u8; 16] {
     encrypted = add_round_key(encrypted, keys[10]);
 
     encrypted
+}
+
+fn shift_rows_inverse(state: [u8; 16]) -> [u8; 16] {
+    let mut modified = [0u8; 16];
+
+    for row in 0..4 {
+        for col in 0..4 {
+            let new_col = (col + 4 - row) % 4;
+            modified[row + 4 * col] = state[row + 4 * new_col];
+        }
+    }
+
+    modified
+}
+
+fn sub_bytes_inverse(state: [u8; 16]) -> [u8; 16] {
+    let mut modified = [0u8; 16];
+    for i in 0..16 {
+        modified[i] = config::SBOXI[state[i] as usize];
+    }
+    modified
+}
+
+fn mix_columns_inverse(state: [u8; 16]) -> [u8; 16] {
+    let mut modified = [0u8; 16];
+    for col in 0..4 {
+        let a0 = state[col * 4];
+        let a1 = state[col * 4 + 1];
+        let a2 = state[col * 4 + 2];
+        let a3 = state[col * 4 + 3];
+        modified[col * 4] = config::MULT_14[a0 as usize]
+            ^ config::MULT_11[a1 as usize]
+            ^ config::MULT_13[a2 as usize]
+            ^ config::MULT_9[a3 as usize];
+        modified[col * 4 + 1] = config::MULT_9[a0 as usize]
+            ^ config::MULT_14[a1 as usize]
+            ^ config::MULT_11[a2 as usize]
+            ^ config::MULT_13[a3 as usize];
+        modified[col * 4 + 2] = config::MULT_13[a0 as usize]
+            ^ config::MULT_9[a1 as usize]
+            ^ config::MULT_14[a2 as usize]
+            ^ config::MULT_11[a3 as usize];
+        modified[col * 4 + 3] = config::MULT_11[a0 as usize]
+            ^ config::MULT_13[a1 as usize]
+            ^ config::MULT_9[a2 as usize]
+            ^ config::MULT_14[a3 as usize];
+    }
+    modified
+}
+pub fn decrypt(encrypted: [u8; 16], key: [u8; 16]) -> [u8; 16] {
+    // encrypted + key -> expansion -> no mixing -> 10 rounds -> pre-whitening -> plaintext
+
+    // E X P A N D
+    let keys = key_expansion(key);
+
+    // no mixing
+    let mut plaintext = add_round_key(encrypted, keys[10]);
+    plaintext = shift_rows_inverse(plaintext);
+    plaintext = sub_bytes_inverse(plaintext);
+
+    for round in (1..10).rev() {
+        plaintext = add_round_key(plaintext, keys[round]);
+        plaintext = mix_columns_inverse(plaintext);
+        plaintext = shift_rows_inverse(plaintext);
+        plaintext = sub_bytes_inverse(plaintext);
+    }
+
+    plaintext = add_round_key(plaintext, keys[0]);
+
+    plaintext
 }
 
 #[cfg(test)]
