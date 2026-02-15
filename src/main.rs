@@ -1,5 +1,4 @@
 mod config;
-mod tests;
 mod aes;
 
 use aes::encrypt;
