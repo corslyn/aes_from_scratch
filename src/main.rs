@@ -78,3 +78,16 @@ fn sub_bytes(state: [u8; 16]) -> [u8; 16] {
     }
     modified
 }
+
+fn shift_rows(state: [u8; 16]) -> [u8; 16] {
+    let mut modified = [0u8; 16];
+
+    for row in 0..4 {
+        for col in 0..4 {
+            let new_col = (col + row) % 4;
+            modified[row + 4 * col] = state[row + 4 * new_col];
+        }
+    }
+
+    modified
+}
