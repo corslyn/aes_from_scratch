@@ -23,3 +23,10 @@ Run tests:
 ```
 cargo test
 ```
+## Examples
+
+Encrypts a plaintext using a key, and decrypts it afterwards
+
+```
+cargo run --example encrypt_decrypt
+```

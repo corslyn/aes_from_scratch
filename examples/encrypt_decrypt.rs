@@ -1,11 +1,5 @@
-mod aes;
-mod config;
-
-use aes::encrypt;
-
-use hex;
-
-use crate::aes::decrypt;
+use aes_from_scratch::decrypt;
+use aes_from_scratch::encrypt;
 
 fn main() {
     let plaintext: [u8; 16] = "Choucroute !!!!!"
@@ -18,6 +12,11 @@ fn main() {
         .unwrap();
     println!("Plaintext : {}", std::str::from_utf8(&plaintext).unwrap());
     let encrypted = encrypt(plaintext, key);
+    print!("Using key : ");
+    for byte in key {
+        print!("{:02x}", byte);
+    }
+    println!();
     print!("Encrypted : ");
     for byte in encrypted {
         print!("{:02x}", byte);
@@ -28,13 +27,4 @@ fn main() {
         "Decrypted : {}",
         std::str::from_utf8(&decrypt(encrypted, key)).expect("not a valid utf8")
     );
-}
-
-fn print_state(state: [u8; 16]) {
-    for row in 0..4 {
-        for col in 0..4 {
-            print!("{:02x} ", state[(row + 4 * col) as usize]);
-        }
-        println!();
-    }
 }
