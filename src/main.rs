@@ -72,7 +72,7 @@ fn print_state(state: [u8; 16]) {
 }
 
 fn sub_bytes(state: [u8; 16]) -> [u8; 16] {
-    let mut modified = state.clone();
+    let mut modified = [0u8; 16];
     for i in 0..16 {
         modified[i as usize] = config::SBOX[i as usize];
     }
@@ -89,5 +89,20 @@ fn shift_rows(state: [u8; 16]) -> [u8; 16] {
         }
     }
 
+    modified
+}
+
+fn mix_columns(state: [u8; 16]) -> [u8; 16] {
+    let mut modified = [0u8; 16];
+    for col in 0..4 {
+        let a0 = state[col * 4];
+        let a1 = state[col * 4 + 1];
+        let a2 = state[col * 4 + 2];
+        let a3 = state[col * 4 + 3];
+        modified[col * 4] = config::MULT_2[a0 as usize] ^ config::MULT_3[a1 as usize] ^ a2 ^ a3;
+        modified[col * 4 + 1] = a0 ^ config::MULT_2[a1 as usize] ^ config::MULT_3[a2 as usize] ^ a3;
+        modified[col * 4 + 2] = a0 ^ a1 ^ config::MULT_2[a2 as usize] ^ config::MULT_3[a3 as usize];
+        modified[col * 4 + 3] = config::MULT_3[a0 as usize] ^ a1 ^ a2 ^ config::MULT_2[a3 as usize];
+    }
     modified
 }
