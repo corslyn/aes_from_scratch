@@ -1,5 +1,6 @@
 mod test {
     use crate::*;
+    use aes::*;
 
     #[test]
     fn rot_word_test() {
