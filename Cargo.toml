@@ -10,6 +10,3 @@ path = "aes/lib.rs"
 hex = "0.4.3"
 rand = "0.10.0"
 
-[[bin]]
-name = "square"
-path = "attacks/square/main.rs"
