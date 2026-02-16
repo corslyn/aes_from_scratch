@@ -11,15 +11,26 @@ fn main() {
 
     let lambda_set = setup(key);
 
-    let guess = 0x00; // real key byte
-    let byte_pos = 0; // test index 5
+    let byte_pos = 5; // test index 5
 
-    //let reversed = reverse_state(&lambda_set, guess, byte_pos);
-
+    let mut guesses = vec![];
     for guess in 0..=255 {
         let reversed = reverse_state(&lambda_set, guess, byte_pos);
-        check_key_guess(guess, &reversed, byte_pos);
+        if let Some(guess) = check_key_guess(guess, &reversed, byte_pos) {
+            guesses.push(guess);
+        }
     }
+
+    while guesses.len() > 1 {
+        let lambda_set = setup(key); // new random set
+
+        guesses.retain(|&guess| {
+            let reversed = reverse_state(&lambda_set, guess, byte_pos);
+            check_key_guess(guess, &reversed, byte_pos).is_some()
+        });
+    }
+
+    println!("last-round key byte {} = {:02x}", byte_pos, guesses[0]);
 }
 
 fn setup(key: [u8; 16]) -> Vec<[u8; 16]> {
@@ -82,7 +93,7 @@ fn reverse_state(lambda_set: &Vec<[u8; 16]>, guess: u8, guess_pos: usize) -> Vec
     reversed
 }
 
-fn check_key_guess(guess: u8, reversed_set: &Vec<[u8; 16]>, byte_pos: usize) {
+fn check_key_guess(guess: u8, reversed_set: &Vec<[u8; 16]>, byte_pos: usize) -> Option<u8> {
     let row = byte_pos % 4;
     let col = byte_pos / 4;
 
@@ -97,5 +108,8 @@ fn check_key_guess(guess: u8, reversed_set: &Vec<[u8; 16]>, byte_pos: usize) {
 
     if xor_sum == 0 {
         println!("possible at {}: {:02x}", byte_pos, guess);
+        Some(guess)
+    } else {
+        None
     }
 }
