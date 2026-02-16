@@ -34,6 +34,11 @@ fn main() {
         println!("last-round key byte {} = {:02x}", byte_pos, guesses[0]);
     }
     println!("Recovered last-round key: {:02x?}", last_round_key);
+    let master = recover_master_key(last_round_key);
+    println!("MASTER KEY: {:02x?}", master);
+
+    assert_eq!(master, key);
+    println!("well guys we did it");
 }
 
 fn setup(key: [u8; 16]) -> Vec<[u8; 16]> {
@@ -115,4 +120,36 @@ fn check_key_guess(guess: u8, reversed_set: &Vec<[u8; 16]>, byte_pos: usize) -> 
     } else {
         None
     }
+}
+
+fn recover_master_key(last_round_key: [u8; 16]) -> [u8; 16] {
+    let mut words = vec![[0u8; 4]; 20]; // 4 rounds * 4 bytes + round 0 = 4*4 + 4 = 20
+    for i in 0..4 {
+        words[16 + i] = [
+            last_round_key[i * 4],
+            last_round_key[i * 4 + 1],
+            last_round_key[i * 4 + 2],
+            last_round_key[i * 4 + 3],
+        ];
+    }
+
+    for i in (4..20).rev() {
+        let temp = words[i];
+
+        if i % 4 == 0 {
+            let mut g = rot_word(words[i - 1]);
+            g = sub_word(g);
+            let r = rcon(i / 4);
+            words[i - 4] = xor_words(temp, xor_words(g, r));
+        } else {
+            words[i - 4] = xor_words(temp, words[i - 1]);
+        }
+    }
+
+    let mut master_key = [0u8; 16];
+    for i in 0..4 {
+        master_key[i * 4..i * 4 + 4].copy_from_slice(&words[i]);
+    }
+
+    master_key // MASTER ! MASTER !
 }
