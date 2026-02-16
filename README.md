@@ -36,3 +36,7 @@ Executes the square attack on 4 rounds AES
 ```
 cargo run --example square_attack
 ```
+
+## Credits
+
+https://web.archive.org/web/20230428141954/https://www.davidwong.fr/blockbreakers/aes.html
