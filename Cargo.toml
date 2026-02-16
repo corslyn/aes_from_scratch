@@ -12,4 +12,4 @@ rand = "0.10.0"
 
 [[bin]]
 name = "square"
-path = "attacks/square/mod.rs"
+path = "attacks/square/main.rs"
