@@ -10,7 +10,7 @@
 
 Some homemade, ~freshly grown~ AES ! (do not use)
 
-Implementing this for square attack implementation...
+Now with 4 rounds attack !
 
 ## Build
 ```
