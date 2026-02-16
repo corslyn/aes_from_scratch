@@ -1,8 +1,4 @@
-mod square {
-    include!("../attacks/square/lib.rs");
-}
-
-use crate::square::*;
+use aes_from_scratch::attacks::square::*;
 
 fn main() {
     let key: [u8; 16] = hex::decode("fbdb67135bfe6322f5361e5ac2671623") // round 4 key at byte 0 should be 44

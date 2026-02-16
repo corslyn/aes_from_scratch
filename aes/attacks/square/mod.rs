@@ -1,4 +1,4 @@
-pub use aes_from_scratch::{config::SBOXI, *};
+pub use crate::{config::SBOXI, *};
 use rand::prelude::*;
 
 pub fn setup(key: [u8; 16]) -> Vec<[u8; 16]> {
