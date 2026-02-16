@@ -6,31 +6,34 @@ fn main() {
         .unwrap()
         .try_into()
         .unwrap();
-
+    // last round key = 4483ed3987ef15c3751b75b27e14ee2b
     println!("Original key: {:02x?}", key);
+
+    let mut last_round_key = [0u8; 16];
 
     let lambda_set = setup(key);
 
-    let byte_pos = 5; // test index 5
-
-    let mut guesses = vec![];
-    for guess in 0..=255 {
-        let reversed = reverse_state(&lambda_set, guess, byte_pos);
-        if let Some(guess) = check_key_guess(guess, &reversed, byte_pos) {
-            guesses.push(guess);
-        }
-    }
-
-    while guesses.len() > 1 {
-        let lambda_set = setup(key); // new random set
-
-        guesses.retain(|&guess| {
+    for byte_pos in 0..16 {
+        let mut guesses = vec![];
+        for guess in 0..=255 {
             let reversed = reverse_state(&lambda_set, guess, byte_pos);
-            check_key_guess(guess, &reversed, byte_pos).is_some()
-        });
-    }
+            if let Some(guess) = check_key_guess(guess, &reversed, byte_pos) {
+                guesses.push(guess);
+            }
+        }
 
-    println!("last-round key byte {} = {:02x}", byte_pos, guesses[0]);
+        while guesses.len() > 1 {
+            let lambda_set = setup(key); // new random set
+
+            guesses.retain(|&guess| {
+                let reversed = reverse_state(&lambda_set, guess, byte_pos);
+                check_key_guess(guess, &reversed, byte_pos).is_some()
+            });
+        }
+        last_round_key[byte_pos] = guesses[0];
+        println!("last-round key byte {} = {:02x}", byte_pos, guesses[0]);
+    }
+    println!("Recovered last-round key: {:02x?}", last_round_key);
 }
 
 fn setup(key: [u8; 16]) -> Vec<[u8; 16]> {
