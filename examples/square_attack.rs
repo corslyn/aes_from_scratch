@@ -1,4 +1,7 @@
-mod square;
+mod square {
+    include!("../attacks/square/lib.rs");
+}
+
 use crate::square::*;
 
 fn main() {
@@ -6,7 +9,6 @@ fn main() {
         .unwrap()
         .try_into()
         .unwrap();
-    // last round key = 4483ed3987ef15c3751b75b27e14ee2b
     println!("Original key: {:02x?}", key);
 
     let mut last_round_key = [0u8; 16];

@@ -30,3 +30,9 @@ Encrypts a plaintext using a key, and decrypts it afterwards
 ```
 cargo run --example encrypt_decrypt
 ```
+
+Executes the square attack on 4 rounds AES
+
+```
+cargo run --example square_attack
+```
