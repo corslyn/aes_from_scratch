@@ -89,7 +89,7 @@ fn mix_columns(state: [u8; 16]) -> [u8; 16] {
     modified
 }
 
-fn add_round_key(state: [u8; 16], round_key: [u8; 16]) -> [u8; 16] {
+pub fn add_round_key(state: [u8; 16], round_key: [u8; 16]) -> [u8; 16] {
     std::array::from_fn(|i| state[i] ^ round_key[i])
 }
 
