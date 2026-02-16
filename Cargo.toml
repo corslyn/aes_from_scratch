@@ -8,6 +8,7 @@ name = "aes_from_scratch"
 path = "aes/lib.rs"
 [dependencies]
 hex = "0.4.3"
+rand = "0.10.0"
 
 [[bin]]
 name = "square"

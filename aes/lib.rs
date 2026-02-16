@@ -1,10 +1,10 @@
-mod config;
+pub mod config;
 
-fn rot_word(word: [u8; 4]) -> [u8; 4] {
+pub fn rot_word(word: [u8; 4]) -> [u8; 4] {
     [word[1], word[2], word[3], word[0]]
 }
 
-fn sub_word(word: [u8; 4]) -> [u8; 4] {
+pub fn sub_word(word: [u8; 4]) -> [u8; 4] {
     [
         config::SBOX[word[0] as usize],
         config::SBOX[word[1] as usize],
@@ -13,11 +13,11 @@ fn sub_word(word: [u8; 4]) -> [u8; 4] {
     ]
 }
 
-fn rcon(input: usize) -> [u8; 4] {
+pub fn rcon(input: usize) -> [u8; 4] {
     [config::RCON[input], 0, 0, 0]
 }
 
-fn xor_words(a: [u8; 4], b: [u8; 4]) -> [u8; 4] {
+pub fn xor_words(a: [u8; 4], b: [u8; 4]) -> [u8; 4] {
     [a[0] ^ b[0], a[1] ^ b[1], a[2] ^ b[2], a[3] ^ b[3]]
 }
 
@@ -114,7 +114,7 @@ pub fn encrypt(plaintext: [u8; 16], key: [u8; 16]) -> [u8; 16] {
     encrypted
 }
 
-fn shift_rows_inverse(state: [u8; 16]) -> [u8; 16] {
+pub fn shift_rows_inverse(state: [u8; 16]) -> [u8; 16] {
     let mut modified = [0u8; 16];
 
     for row in 0..4 {
@@ -127,7 +127,7 @@ fn shift_rows_inverse(state: [u8; 16]) -> [u8; 16] {
     modified
 }
 
-fn sub_bytes_inverse(state: [u8; 16]) -> [u8; 16] {
+pub fn sub_bytes_inverse(state: [u8; 16]) -> [u8; 16] {
     let mut modified = [0u8; 16];
     for i in 0..16 {
         modified[i] = config::SBOXI[state[i] as usize];
@@ -135,7 +135,7 @@ fn sub_bytes_inverse(state: [u8; 16]) -> [u8; 16] {
     modified
 }
 
-fn mix_columns_inverse(state: [u8; 16]) -> [u8; 16] {
+pub fn mix_columns_inverse(state: [u8; 16]) -> [u8; 16] {
     let mut modified = [0u8; 16];
     for col in 0..4 {
         let a0 = state[col * 4];
@@ -182,6 +182,41 @@ pub fn decrypt(encrypted: [u8; 16], key: [u8; 16]) -> [u8; 16] {
     plaintext = add_round_key(plaintext, keys[0]);
 
     plaintext
+}
+
+pub fn encrypt_with_rounds(plaintext: [u8; 16], key: [u8; 16], rounds: usize) -> [u8; 16] {
+    let keys = key_expansion(key);
+    // pre-whitening
+    let mut encrypted = add_round_key(plaintext, keys[0]);
+
+    // round 1 to n
+    for round in 1..rounds {
+        encrypted = sub_bytes(encrypted);
+        encrypted = shift_rows(encrypted);
+        encrypted = mix_columns(encrypted);
+        encrypted = add_round_key(encrypted, keys[round]);
+    }
+
+    // last round (no mixing)
+    encrypted = sub_bytes(encrypted);
+    encrypted = shift_rows(encrypted);
+
+    encrypted = add_round_key(encrypted, keys[rounds]);
+
+    encrypted
+}
+
+pub fn rot_word_inverse(word: [u8; 4]) -> [u8; 4] {
+    [word[3], word[0], word[1], word[2]]
+}
+
+pub fn sub_word_inverse(word: [u8; 4]) -> [u8; 4] {
+    [
+        config::SBOXI[word[0] as usize],
+        config::SBOXI[word[1] as usize],
+        config::SBOXI[word[2] as usize],
+        config::SBOXI[word[3] as usize],
+    ]
 }
 
 #[cfg(test)]
